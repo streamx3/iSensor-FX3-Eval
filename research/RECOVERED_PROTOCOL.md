@@ -1,6 +1,6 @@
 # Recovered protocol & interop facts
 
-Facts recovered from the shipped binaries in [`resources/`](../../resources) during the
+Facts recovered from the shipped binaries in [`resources/`](../resources) during the
 CyUSB-shim bring-up. This file exists so the research survives without the decompiler output,
 which is deliberately **not** committed (see design doc Part 6.2 — decompiled ADI code is
 reference material only, never copied into the port).
@@ -20,14 +20,14 @@ The bitbucket URL is ADI-internal; the public mirror of that repo is the
 ## Regenerating
 
 ```bash
-mkdir -p /tmp/fx3re/bin && cp resources/FX3Api.dll /tmp/fx3re/bin/
-cd /tmp/fx3re && ilspycmd -o . bin/FX3Api.dll
-awk '/public enum USBCommands$/,/^\t}/' FX3Api.decompiled.cs
+research/decompile.sh                       # -> research/decompiled/ (git-ignored)
+awk '/public enum USBCommands$/,/^\t}/' research/decompiled/FX3Api.decompiled.cs
 ```
 
-Decompile from a **copy outside the repo**: ILSpy also writes the assembly's embedded resources
-(`FX3Api.CurrentURL.txt` etc.) next to its input, which is how five stray files ended up in
-`resources/` the first time. Never decompile `CyUSB.dll` (Cypress agreement §1.2).
+The script decompiles from temp copies (ILSpy writes embedded resources next to its input — how
+five stray `FX3Api.*.txt` files once landed in `resources/`), never touches `CyUSB.dll`
+(Cypress agreement §1.2), and records input hashes in `MANIFEST.txt`. See
+[METHODOLOGY.md](METHODOLOGY.md) for why `CyUSB.dll` must also stay *off* the reference path.
 
 ---
 
@@ -100,6 +100,23 @@ standard Cypress bootloader RAM-write request used by `DownloadFw`.
 So `bmRequestType` is always `0x40` (to device) or `0xC0` (from device) — a plain
 `libusb_control_transfer`. Typical timeout passed to `XferControlData`: 2000 ms
 (e.g. firmware ID read: 32-byte IN).
+
+### `XferControlData` quirks — do not replicate
+
+All EP0 traffic goes through one private method. Its behaviour (re-verified 2026-10-10):
+
+1. Acquire `m_ControlMutex`, waiting at most `Timeout` ms; fail if not acquired.
+2. Call `ControlEndPt.XferData(ref buf, ref len)`.
+3. **Overwrite the transfer result** with `elapsed_ms <= Timeout`.
+
+Consequences:
+
+- **A control transfer that fails quickly is reported as success.** Only slow transfers fail.
+  Callers then parse whatever is in the buffer. A reimplementation must check the real transfer
+  status (and actual length).
+- The `Timeout` argument never reaches USB. `FX3Api` never assigns `CyUSBEndPoint.TimeOut`, so the
+  bus-level timeout is CyUSB's endpoint default (not recovered; the shim uses 1000 ms).
+- Control transfers are serialised by the mutex; bulk transfers are not.
 
 ## Endpoints — `FX3Api.EndpointAddresses`
 

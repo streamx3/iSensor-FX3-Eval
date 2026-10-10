@@ -1,7 +1,7 @@
 # CyUSB shim — run the legacy FX3 stack on Linux/macOS and trace the USB protocol
 
-Interop scaffolding for the Qt port (see [../../QT_PORT_DESIGN.md](../../QT_PORT_DESIGN.md), Part 6).
-Recovered constants (opcodes, endpoints, enums, identities): [RECOVERED_PROTOCOL.md](RECOVERED_PROTOCOL.md).
+Interop scaffolding for the Qt port (see [../../QT_PORT_DESIGN.md](../../research/QT_PORT_DESIGN.md), Part 6).
+Recovered constants (opcodes, endpoints, enums, identities): [RECOVERED_PROTOCOL.md](../../research/RECOVERED_PROTOCOL.md).
 
 It replaces the Windows-only USB layer under ADI's closed `FX3Api`/`adisInterface`
 binaries with a **libusb-1.0** implementation, so the existing evaluation stack runs

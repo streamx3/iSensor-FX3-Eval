@@ -22,10 +22,10 @@ proprietary Cypress/Infineon components.
 
 **1. The stated license is MIT, but every source file header contradicts it.**
 
-[LICENSE](LICENSE) is a clean MIT license, `Copyright (c) 2018-2021 Analog Devices Inc`.
+[LICENSE](../LICENSE) is a clean MIT license, `Copyright (c) 2018-2021 Analog Devices Inc`.
 However, all ~40 first-party source files carry this header — for example
-[TopGUI.vb:1](src/TopGUI.vb:1), [Wrapper.cs:2](src_wrapper/Wrapper.cs:2),
-[Logger.vb:2](src_StreamDataLogger/Logger.vb:2):
+[TopGUI.vb:1](../src/TopGUI.vb:1), [Wrapper.cs:2](../src_wrapper/Wrapper.cs:2),
+[Logger.vb:2](../src_StreamDataLogger/Logger.vb:2):
 
 > `'This software is proprietary to Analog Devices, Inc. and its licensors.`
 
@@ -37,7 +37,7 @@ relying on it.
 
 **2. The binary dependency wall.** Nothing in `src/`, `src_wrapper/`, or `src_StreamDataLogger/`
 compiles without these, and none of them have source here — see
-[iSensorFX3Eval.vbproj:74-100](src/iSensorFX3Eval.vbproj:74):
+[iSensorFX3Eval.vbproj:74-100](../src/iSensorFX3Eval.vbproj:74):
 
 | Binary | Origin | Source available? | License |
 |---|---|---|---|
@@ -48,7 +48,7 @@ compiles without these, and none of them have source here — see
 | `adisInterface.dll` | ADI | **No** | **Closed source** |
 | `SignalProcessing.dll` | ADI | **No** (not found published) | Undetermined |
 | `sdpApi1.dll` | ADI legacy SDP | **No** (present but unreferenced by any project file) | Undetermined |
-| `CyUSB.dll` | Cypress/Infineon EZ-USB FX3 SDK | **No** | **Proprietary** — see [cypress_software_license.txt](resources/cypress_software_license.txt) |
+| `CyUSB.dll` | Cypress/Infineon EZ-USB FX3 SDK | **No** | **Proprietary** — see [cypress_software_license.txt](../resources/cypress_software_license.txt) |
 | `AForge.Math.dll` | AForge.NET | Yes, third party | **LGPL v3** (copyleft) |
 | `FX3DriverSetup.exe` | Cypress CyUSB3 kernel driver | **No** | **Proprietary, Windows-only** |
 | `FX3_Firmware.img`, `boot_fw.img`, `USBFlashProg.img` | ADI firmware built against the Cypress FX3 SDK | Firmware source upstream (MIT); Cypress SDK objects are linked in | Mixed |
@@ -63,7 +63,7 @@ That is `adisApi.dll` / `adisInterface.dll` — and they are not incidental. `ad
 read/write and buffered-streaming abstraction the GUI is built on**. Every form in `src/` calls into
 it.
 
-**4. Cypress terms are restrictive.** [cypress_software_license.txt](resources/cypress_software_license.txt)
+**4. Cypress terms are restrictive.** [cypress_software_license.txt](../resources/cypress_software_license.txt)
 grants source use only for "Licensee's internal use", requires Source Code be kept **confidential**
 (§1.4, §5.2), permits redistribution in **object code form only** (§1.3), and only "with the
 applicable Licensee Product" incorporating a Cypress IC. §6.1 even forbids publishing benchmarks.
@@ -73,7 +73,7 @@ This is the opposite of an open-source license.
 ([AForge.NET License.txt](https://github.com/andrewkirillov/AForge.NET/blob/master/License.txt)).
 Fine to link dynamically from an MIT app, but it is a copyleft obligation that must be honoured
 (and is not documented anywhere in this repo). The generated `docs/` tree is Ms-PL (Sandcastle) —
-see [docs/LICENSE](docs/LICENSE).
+see [docs/LICENSE](../docs/LICENSE).
 
 ### What this means for the port
 
@@ -129,7 +129,7 @@ which is publicly documented and implemented by open tools (`fxload`, `cyusb_lin
 
 ~16.8 kLOC of VB.NET/C#, WinForms, .NET Framework 4.5, single-window-plus-satellite-forms design.
 
-### Feature inventory (from [src/guide/guide.md](src/guide/guide.md) and the forms)
+### Feature inventory (from [src/guide/guide.md](../src/guide/guide.md) and the forms)
 
 | # | Feature | Implementing form | Port priority |
 |---|---|---|---|
@@ -151,7 +151,7 @@ which is publicly documented and implemented by open tools (`fxload`, `cyusb_lin
 | 16 | DUT factory reset + flash update | `FacResetGUI` | **P2** |
 | 17 | ADcmXL real-time streaming + buffered (time/FFT) capture | `ADcmXLStreamingGUI`, `ADcmXLBufferedLogGUI` | **P3** (machine-health parts, not IMUs) |
 | 18 | API/board info, USB latency measurement, CRC4 helper | `ApiInfoGUI`, `TopGUI` | **P2** |
-| 19 | Binary pattern file writer | `BinaryFileWriterGUI` | **P3** (author himself calls it out of place, [BinaryFileWriterGUI.vb:5](src/BinaryFileWriterGUI.vb:5)) |
+| 19 | Binary pattern file writer | `BinaryFileWriterGUI` | **P3** (author himself calls it out of place, [BinaryFileWriterGUI.vb:5](../src/BinaryFileWriterGUI.vb:5)) |
 | 20 | Colour palette config, welcome guide, GitHub release check | `ColorPaletteGUI`, `WelcomeGuideGUI` | **P3** |
 | 21 | `FX3ApiWrapper` for Python/MATLAB/LabVIEW interop | `src_wrapper` | **P2** (becomes a C API + Python binding) |
 
@@ -177,24 +177,24 @@ WinForms (src/*.vb)            ← 14 forms, all reach directly into TopGUI.FX3 
    handle, the regmap, plot state, personality state, and the register grid. Every satellite form
    takes a `TopGUI` reference and mutates it. There is no model layer.
 2. **Hardware coupling from the UI thread.** Forms call blocking SPI directly
-   (e.g. [TopGUI_RegisterForm.vb:197](src/TopGUI_RegisterForm.vb:197) does a page read inside a
+   (e.g. [TopGUI_RegisterForm.vb:197](../src/TopGUI_RegisterForm.vb:197) does a page read inside a
    cell-click handler). `System.Timers.Timer` callbacks then `BeginInvoke` back to the UI.
-3. **Per-device logic hardcoded in a switch.** [BurstManager.vb:561-808](src/HelperClasses/BurstManager.vb:561)
+3. **Per-device logic hardcoded in a switch.** [BurstManager.vb:561-808](../src/HelperClasses/BurstManager.vb:561)
    is a 250-line `If personality.Contains("1657") ... ElseIf ...` chain. **Adding an IMU means
    editing and recompiling this file.** This is the single biggest blocker to the modularity goal.
 4. **String-matching heuristics.** Burst channel discovery matches register labels for
-   `"GYR"`/`"ACC"`/`"ANG"`/`"VEL"` ([BurstManager.vb:473-516](src/HelperClasses/BurstManager.vb:473)),
+   `"GYR"`/`"ACC"`/`"ANG"`/`"VEL"` ([BurstManager.vb:473-516](../src/HelperClasses/BurstManager.vb:473)),
    and scratch/command registers are found by trying a list of ten candidate names
-   ([TopGUI.vb:901](src/TopGUI.vb:901), [TopGUI.vb:1003](src/TopGUI.vb:1003)). The author's own
+   ([TopGUI.vb:901](../src/TopGUI.vb:901), [TopGUI.vb:1003](../src/TopGUI.vb:1003)). The author's own
    comment: *"I'm not in love with how this is being done, but here we are."*
 5. **Swallowed exceptions.** `Catch ex As Exception` + `'squash` appears throughout; a failed
    personality parse silently yields a half-populated object
-   ([DutPersonality.vb:339-345](src/HelperClasses/DutPersonality.vb:339)).
-6. **Windows-isms.** `\` path separators hardcoded ([Logger.vb:224](src_StreamDataLogger/Logger.vb:224),
-   [TopGUI.vb:117](src/TopGUI.vb:117)), `My.Settings`, `MsgBox`, registry-backed user config,
+   ([DutPersonality.vb:339-345](../src/HelperClasses/DutPersonality.vb:339)).
+6. **Windows-isms.** `\` path separators hardcoded ([Logger.vb:224](../src_StreamDataLogger/Logger.vb:224),
+   [TopGUI.vb:117](../src/TopGUI.vb:117)), `My.Settings`, `MsgBox`, registry-backed user config,
    `System.Windows.Forms.DataVisualization` charting.
 7. **Global mutable hardware state.** Forms flip `FX3.DrActive` on `Activated`
-   ([IMUStreamingGUI.vb:114](src/IMUStreamingGUI.vb:114)) to undo what another form did. Two forms
+   ([IMUStreamingGUI.vb:114](../src/IMUStreamingGUI.vb:114)) to undo what another form did. Two forms
    fighting over the board is prevented only by disabling buttons.
 
 ---
@@ -306,7 +306,7 @@ but it is slower and less complete — prefer the MIT source.
 ### 2.3 `libfx3/board` — `Fx3Board`
 
 Direct port of `FX3Connection`'s public surface. The full surface extracted from
-[FX3Api.xml](resources/FX3Api.xml) is in the appendix; group it as:
+[FX3Api.xml](../resources/FX3Api.xml) is in the appendix; group it as:
 
 | Group | Members |
 |---|---|
@@ -325,12 +325,12 @@ Events (`NewBufferAvailable`, `StreamFinished`, `UnexpectedDisconnect`, `Disconn
 become Qt signals on the controller, or `std::function` callbacks in the GUI-free library.
 
 **Behavioural details worth preserving** (they encode hard-won hardware knowledge):
-- Disconnect timeout handling with a 10 s timer ([TopGUI.vb:214](src/TopGUI.vb:214)).
+- Disconnect timeout handling with a 10 s timer ([TopGUI.vb:214](../src/TopGUI.vb:214)).
 - "Board busy" recovery: offer to reset all FX3s, then re-enumerate
-  ([TopGUI.vb:1468](src/TopGUI.vb:1468)).
-- Debugger-attached boards may be shared ([TopGUI.vb:1396](src/TopGUI.vb:1396)) — keep as an
+  ([TopGUI.vb:1468](../src/TopGUI.vb:1468)).
+- Debugger-attached boards may be shared ([TopGUI.vb:1396](../src/TopGUI.vb:1396)) — keep as an
   explicit `allowSharedBoard` flag rather than a debugger check.
-- Watchdog is disabled on connect ([TopGUI.vb:1450](src/TopGUI.vb:1450)).
+- Watchdog is disabled on connect ([TopGUI.vb:1450](../src/TopGUI.vb:1450)).
 
 ### 2.4 `libdut/transport` — replacing the closed `adisInterface`
 
@@ -361,8 +361,8 @@ public:
 Signed/scaled variants are **free functions** over `Register` metadata, not virtuals — the original
 put `ReadSigned` / `ReadScaledValue` / `ScaleRegData` / `UnscaleRegData` on the interface, which
 forced every protocol to reimplement identical arithmetic. Scaling is `value * reg.scale + reg.offset`
-([Logger.vb:629](src_StreamDataLogger/Logger.vb:629)); two's-complement conversion is in
-[SignedConverter.vb](src_StreamDataLogger/SignedConverter.vb).
+([Logger.vb:629](../src_StreamDataLogger/Logger.vb:629)); two's-complement conversion is in
+[SignedConverter.vb](../src_StreamDataLogger/SignedConverter.vb).
 
 Concrete implementations, one per SPI framing (mirroring the closed classes they replace):
 
@@ -376,14 +376,14 @@ Concrete implementations, one per SPI framing (mirroring the closed classes they
 | `AdcmTransport` | `AdcmInterface{1,2,3}Axis` | ADcmXL machine-health parts (P3) |
 
 **Recoverable specification for each:** the automotive CRC4 algorithm is fully present in
-[HelperFunctions.vb:64](src/HelperClasses/HelperFunctions.vb:64) (`CalcCRC28Bit`, seed `0b1010`);
-the CCITT-16 burst CRC is at [HelperFunctions.vb:225](src/HelperClasses/HelperFunctions.vb:225);
+[HelperFunctions.vb:64](../src/HelperClasses/HelperFunctions.vb:64) (`CalcCRC28Bit`, seed `0b1010`);
+the CCITT-16 burst CRC is at [HelperFunctions.vb:225](../src/HelperClasses/HelperFunctions.vb:225);
 the component-SPI field positions come from `AddrPosition`/`DataPosition`/`WriteBitPosition`/
-`WriteBitPolarity` in [DutPersonality.vb:77-94](src/HelperClasses/DutPersonality.vb:77) and the CSV
-in [dut_personalities.csv](src/UserConfig/dut_personalities.csv). Exception semantics to reproduce:
+`WriteBitPolarity` in [DutPersonality.vb:77-94](../src/HelperClasses/DutPersonality.vb:77) and the CSV
+in [dut_personalities.csv](../src/UserConfig/dut_personalities.csv). Exception semantics to reproduce:
 `SpiException`, `InvalidCRCException`, `TransactionCounterException`, `StateVectorException`,
 `SpiAddressException` — with the "log, don't throw" mode the register form relies on
-([TopGUI.vb:220](src/TopGUI.vb:220), [TopGUI_RegisterForm.vb:555](src/TopGUI_RegisterForm.vb:555)).
+([TopGUI.vb:220](../src/TopGUI.vb:220), [TopGUI_RegisterForm.vb:555](../src/TopGUI_RegisterForm.vb:555)).
 
 **Verification plan:** wire the old .NET app and the new C++ transport to the same board and diff
 SPI traffic on a logic analyser, register by register, for one part per family.
@@ -391,7 +391,7 @@ SPI traffic on a logic analyser, register by register, for one part per family.
 ### 2.5 `libdut/regmap` — register map
 
 Straight port of `RegMapClasses`. The CSV schema is stable across all 92 files
-(header from [ADIS16133_RegMap.csv](regmaps/ADIS16133_RegMap.csv)):
+(header from [ADIS16133_RegMap.csv](../regmaps/ADIS16133_RegMap.csv)):
 
 ```
 Label,Page,Addr,NumBytes,RegOffset,RegScale,ReadLen,ReadFlag,WriteFlag,TwosCompl,Hidden,Default,CalReg
@@ -532,7 +532,7 @@ new SPI framing needs C++ — and that is a new `RegisterTransport` subclass reg
 can be a runtime plugin (`QPluginLoader`) if you want third-party extension without touching the tree.
 
 **Migration:** write a one-shot converter from
-[dut_personalities.csv](src/UserConfig/dut_personalities.csv) (+ the `BurstManager` switch) to the
+[dut_personalities.csv](../src/UserConfig/dut_personalities.csv) (+ the `BurstManager` switch) to the
 new descriptors, and keep reading legacy `custom_personality.csv` for one release.
 
 TOML is suggested for comment support and human editability (`toml++`, MIT). JSON via `QJsonDocument`
@@ -546,36 +546,36 @@ is acceptable if you want zero new dependencies — but then keep a schema file 
   stripping, padding, length validation, and checksum verification.
 
 Port the existing behaviours faithfully — they are correct and non-obvious:
-- ADIS1655x/1657x: whole packet is payload ([BurstManager.vb:300](src/HelperClasses/BurstManager.vb:300)).
+- ADIS1655x/1657x: whole packet is payload ([BurstManager.vb:300](../src/HelperClasses/BurstManager.vb:300)).
 - ADIS1649x/1654x: scan forward to the sync word, then past repeated sync words
-  ([BurstManager.vb:303-324](src/HelperClasses/BurstManager.vb:303)).
-- Everything else: drop the first word ([BurstManager.vb:325](src/HelperClasses/BurstManager.vb:325)).
+  ([BurstManager.vb:303-324](../src/HelperClasses/BurstManager.vb:303)).
+- Everything else: drop the first word ([BurstManager.vb:325](../src/HelperClasses/BurstManager.vb:325)).
 - Short packet → zero-pad and set a parse-error string, do not throw
-  ([BurstManager.vb:330](src/HelperClasses/BurstManager.vb:330)) — the UI shows it in the status label.
+  ([BurstManager.vb:330](../src/HelperClasses/BurstManager.vb:330)) — the UI shows it in the status label.
 - ADIS1655x transmits upper 16 bits first despite the higher address
-  ([IMUStreamingGUI.vb:163](src/IMUStreamingGUI.vb:163)) — becomes `lower_word_first = false` in the descriptor.
+  ([IMUStreamingGUI.vb:163](../src/IMUStreamingGUI.vb:163)) — becomes `lower_word_first = false` in the descriptor.
 
 Add what the original lacks: **checksum verification is computed but never checked** in the streaming
 path. Verify it, count failures, and surface a per-stream error rate.
 
 ### 2.8 `libdaq/logger`
 
-Port [Logger.vb](src_StreamDataLogger/Logger.vb) — the design is sound: a producer callback enqueues
+Port [Logger.vb](../src_StreamDataLogger/Logger.vb) — the design is sound: a producer callback enqueues
 buffers on a lock-free/mutex queue, a dedicated writer thread consumes a command queue
 (`CreateFile` / `WriteData` / `FinalizeFile`), files roll at `FileMaxDataRows` (default 1 000 000, to
 stay Excel-openable), a watchdog timer cancels on buffer starvation.
 
 Improvements to make while porting:
-- Use `std::filesystem::path`; drop the `"\\"` assumption ([Logger.vb:224](src_StreamDataLogger/Logger.vb:224)).
+- Use `std::filesystem::path`; drop the `"\\"` assumption ([Logger.vb:224](../src_StreamDataLogger/Logger.vb:224)).
 - Bound the data queue (currently unbounded `ConcurrentQueue` — a slow disk grows RAM without limit).
 - Offer a binary/HDF5-style output alongside CSV; at 16 kHz × 20 channels CSV is the bottleneck.
 - Keep the exact CSV column semantics: one column per register, optional trailing
   `USB_TIMESTAMP_MS` (ms since stream start), optional scaling
-  ([Logger.vb:562-648](src_StreamDataLogger/Logger.vb:562)).
+  ([Logger.vb:562-648](../src_StreamDataLogger/Logger.vb:562)).
 
 ### 2.9 `libdaq/dsp` — replacing `SignalProcessing.dll`
 
-`FFT_Streamer` (used by [FrequencyPlotGUI.vb:35](src/FrequencyPlotGUI.vb:35)) is closed source.
+`FFT_Streamer` (used by [FrequencyPlotGUI.vb:35](../src/FrequencyPlotGUI.vb:35)) is closed source.
 Reimplement: streams a register list, accumulates N samples (N = 2^n, n = 3..14), applies a window,
 FFT, magnitude, optional DC null, optional averaging over M frames, and reports −3 dB passband
 between user-set min/max.
@@ -584,7 +584,7 @@ between user-set min/max.
 would relicense the whole app. This also lets you drop the LGPL `AForge.Math` dependency entirely.
 
 Sample rate comes from measuring the data-ready pin frequency
-([FrequencyPlotGUI.vb:186](src/FrequencyPlotGUI.vb:186)) — keep that, and re-measure periodically.
+([FrequencyPlotGUI.vb:186](../src/FrequencyPlotGUI.vb:186)) — keep that, and re-measure periodically.
 
 ### 2.10 `app` — the Qt layer
 
@@ -621,7 +621,7 @@ and emits `configurationChanged` so every open view stays in sync.
 | Custom `QPainter`/RHI widget | yours | ✅ best performance; ~1–2 weeks of work |
 
 Recommendation: **Qwt** for v1, behind a thin `PlotWidget` interface so a custom renderer can replace
-it later if the 200-sample-window real-time update rate ([PlotterSettings.vb:19](src/HelperClasses/PlotterSettings.vb:19))
+it later if the 200-sample-window real-time update rate ([PlotterSettings.vb:19](../src/HelperClasses/PlotterSettings.vb:19))
 proves too slow.
 
 **Settings:** `QSettings` replaces `My.Settings` (window geometry, colours, last board SN, last
@@ -657,10 +657,10 @@ in `QStandardPaths::AppConfigLocation` — not the Windows registry.
 ### 2.11 `bindings` — replacing `src_wrapper`
 
 `FX3ApiWrapper` exists so Python/MATLAB/LabVIEW users can drive the board
-([Wrapper.cs](src_wrapper/Wrapper.cs)). Reimplement as:
+([Wrapper.cs](../src_wrapper/Wrapper.cs)). Reimplement as:
 - a stable **C ABI** (`libfx3_c.h`) over `libfx3` + `libdut`, and
 - a **pybind11** Python module (`pyfx3`) mirroring the `Wrapper` method names so existing scripts
-  in [src_wrapper/examples/](src_wrapper/examples) port with minimal edits.
+  in [src_wrapper/examples/](../src_wrapper/examples) port with minimal edits.
 
 MATLAB `loadlibrary` and LabVIEW's Call Library node both consume the C ABI directly — this is
 strictly better than requiring .NET interop, and it works on Linux/macOS.
@@ -675,9 +675,9 @@ Replace `Catch ex As Exception` + `'squash` with a typed error model:
 `std::expected<T, DeviceError>` (C++23) or an explicit `Result<T>`. Three severities:
 **fatal** (board gone → disconnect and tell the user), **operation failed** (surface in status bar,
 keep running), **degraded** (CRC error counter, parse-error string — the pattern
-[BurstManager.vb:127](src/HelperClasses/BurstManager.vb:127) already uses).
+[BurstManager.vb:127](../src/HelperClasses/BurstManager.vb:127) already uses).
 
-Preserve the crash log: [TopGUI.vb:791-847](src/TopGUI.vb:791) writes a CSV of
+Preserve the crash log: [TopGUI.vb:791-847](../src/TopGUI.vb:791) writes a CSV of
 date/user/OS/regmap/version/FX3 uptime/SN/board type/exception. Keep it (minus `Environment.UserName`
 — that is unnecessary PII in a file users email to support; log it only on explicit opt-in).
 
@@ -811,7 +811,7 @@ derived from them. Keep that boundary clean and there is no licensing consequenc
 |---|---|---|
 | `adisApi`, `adisInterface`, `SignalProcessing`, `FX3Api`, `RegMapClasses`, `FX3USB` | **Decompile freely** | Repo LICENSE is MIT, which permits it outright. No anti-RE clause exists on these files — verified: embedded strings contain only a bare `AssemblyCopyright` attribute, no EULA text |
 | Same, under the pessimistic "per-file proprietary header governs" reading | **Still permitted for interoperability** | EU Software Directive Art. 6 makes the decompilation-for-interop right **non-waivable by contract**; Art. 5(3) grants observation/study rights. US: *Sega v. Accolade*, *Sony v. Connectix* |
-| `CyUSB.dll` | **DO NOT decompile** | [Cypress agreement §1.2](resources/cypress_software_license.txt:53) explicitly prohibits decompiling/disassembling/reverse engineering |
+| `CyUSB.dll` | **DO NOT decompile** | [Cypress agreement §1.2](../resources/cypress_software_license.txt:53) explicitly prohibits decompiling/disassembling/reverse engineering |
 | `sdpApi1.dll` | **Do not touch** | Marked ADI-internal; irrelevant to the port |
 | FX3 firmware `.img` | **Do not touch** | Source is MIT upstream; blobs ship unmodified |
 
@@ -880,11 +880,11 @@ highest-risk unknown (the protocol) into observed fact and gives phases 1–8 a 
 against. Note the shim is **interop scaffolding, not a deliverable** — it links closed ADI binaries
 and must not ship.
 
-#### Status: BUILT AND WORKING — see [tools/cyusb-shim/](tools/cyusb-shim)
+#### Status: BUILT AND WORKING — see [tools/cyusb-shim/](../tools/cyusb-shim)
 
 Full recovered constant tables (42 opcodes, endpoints, every enum the port needs, assembly
 identities, CyUSB/VB surfaces, upstream build provenance) are in
-[tools/cyusb-shim/RECOVERED_PROTOCOL.md](tools/cyusb-shim/RECOVERED_PROTOCOL.md). Decompiler output
+[RECOVERED_PROTOCOL.md](RECOVERED_PROTOCOL.md). Decompiler output
 itself is intentionally not committed — that file says how to regenerate it.
 
 > **2026-10-10 re-verification.** Fork confirmed in sync with upstream (`42d7b95`, release
@@ -989,7 +989,7 @@ readable CIL, and the shim makes it observable at runtime.
 
 ## Appendix A — `FX3Connection` surface to port
 
-Extracted from [resources/FX3Api.xml](resources/FX3Api.xml). Properties: `ActiveFX3`,
+Extracted from [resources/FX3Api.xml](../resources/FX3Api.xml). Properties: `ActiveFX3`,
 `ActiveFX3SerialNumber`, `AvailableFX3s`, `BusyFX3s`, `FX3BoardAttached`, `BitBangSpiConfig`,
 `BootloaderPath`, `FirmwarePath`, `FlashProgrammerPath`, `BufferAvailable`, `BurstByteCount`,
 `BurstMOSIData`, `BurstMode`, `ChipSelectControl`, `ChipSelectLagTime`, `ChipSelectLeadTime`,
@@ -1013,11 +1013,11 @@ Exceptions to mirror: `FX3Exception`, `FX3BadStatusException`, `FX3Communication
 
 | File | Why |
 |---|---|
-| [src/HelperClasses/BurstManager.vb](src/HelperClasses/BurstManager.vb) | Every per-IMU burst quirk, in one place. The spec for `devices/*.toml`. |
-| [src/HelperClasses/DutPersonality.vb](src/HelperClasses/DutPersonality.vb) | Personality schema and FX3 application semantics |
-| [src_StreamDataLogger/Logger.vb](src_StreamDataLogger/Logger.vb) | Async logging design worth keeping |
-| [src/TopGUI_RegisterForm.vb](src/TopGUI_RegisterForm.vb) | Register grid semantics, hex/scaled toggling, page validation |
-| [src/HelperClasses/HelperFunctions.vb](src/HelperClasses/HelperFunctions.vb) | CRC4 and CCITT-16 reference implementations |
-| [src/UserConfig/dut_personalities.csv](src/UserConfig/dut_personalities.csv) | The full supported-device list with real settings |
-| [src/guide/guide.md](src/guide/guide.md) | User-facing feature contract |
-| [src_wrapper/Wrapper.cs](src_wrapper/Wrapper.cs) | The headless API surface users actually depend on |
+| [src/HelperClasses/BurstManager.vb](../src/HelperClasses/BurstManager.vb) | Every per-IMU burst quirk, in one place. The spec for `devices/*.toml`. |
+| [src/HelperClasses/DutPersonality.vb](../src/HelperClasses/DutPersonality.vb) | Personality schema and FX3 application semantics |
+| [src_StreamDataLogger/Logger.vb](../src_StreamDataLogger/Logger.vb) | Async logging design worth keeping |
+| [src/TopGUI_RegisterForm.vb](../src/TopGUI_RegisterForm.vb) | Register grid semantics, hex/scaled toggling, page validation |
+| [src/HelperClasses/HelperFunctions.vb](../src/HelperClasses/HelperFunctions.vb) | CRC4 and CCITT-16 reference implementations |
+| [src/UserConfig/dut_personalities.csv](../src/UserConfig/dut_personalities.csv) | The full supported-device list with real settings |
+| [src/guide/guide.md](../src/guide/guide.md) | User-facing feature contract |
+| [src_wrapper/Wrapper.cs](../src_wrapper/Wrapper.cs) | The headless API surface users actually depend on |
