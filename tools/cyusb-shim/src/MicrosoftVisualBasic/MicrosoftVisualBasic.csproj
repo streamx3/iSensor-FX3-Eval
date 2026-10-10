@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Minimal Microsoft.VisualBasic runtime for Mono.
+    Identity must match FX3Api's binding reference:
+        Name=Microsoft.VisualBasic  Version=10.0.0.0  PublicKeyToken=b03f5f7f11d50a3a
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>Microsoft.VisualBasic</AssemblyName>
+    <RootNamespace>Microsoft.VisualBasic</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <FileVersion>10.0.0.0</FileVersion>
+    <Version>10.0.0.0</Version>
+    <AssemblyTitle>Microsoft.VisualBasic</AssemblyTitle>
+
+    <SignAssembly>true</SignAssembly>
+    <PublicSign>true</PublicSign>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\msvb-public.snk</AssemblyOriginatorKeyFile>
+
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

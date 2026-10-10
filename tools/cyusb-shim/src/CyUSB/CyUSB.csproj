@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Drop-in replacement for Cypress CyUSB.dll, backed by libusb-1.0.
+
+    Assembly identity MUST match what FX3Api.dll binds against:
+        Name=CyUSB  Version=1.2.3.0  PublicKeyToken=01F1D2B6C851AE92
+
+    The token is derived from the PUBLIC half of Cypress's signing key, extracted
+    from the shipped CyUSB.dll metadata (public data — not decompilation, and not
+    covered by the Cypress no-reverse-engineering clause).
+
+    We cannot produce a valid signature without Cypress's private key, so we use
+    OSS "public signing" (PublicSign=true): the assembly carries the correct
+    public key and therefore the correct token, but the signature is invalid.
+    Mono does not verify strong-name signatures, so binding succeeds.
+    This assembly will NOT load on .NET Framework on Windows without
+    skip-verification registration — that is out of scope by design.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>CyUSB</AssemblyName>
+    <RootNamespace>CyUSB</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Must emit AssemblyVersion: FX3Api binds to CyUSB, Version=1.2.3.0 exactly. -->
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyVersion>1.2.3.0</AssemblyVersion>
+    <FileVersion>1.2.3.0</FileVersion>
+    <Version>1.2.3.0</Version>
+    <Product>CyUSB</Product>
+    <AssemblyTitle>CyUSB</AssemblyTitle>
+
+    <SignAssembly>true</SignAssembly>
+    <PublicSign>true</PublicSign>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\cyusb-public.snk</AssemblyOriginatorKeyFile>
+
+    <!-- net48 on macOS/Linux needs the reference assemblies package -->
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
